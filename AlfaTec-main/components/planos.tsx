@@ -41,10 +41,17 @@ const plans = [
 ];
 
 export function Plans() {
+
+  const scrollToCadastro = () => {
+    document.getElementById("contato")?.scrollIntoView({
+      behavior: "smooth",
+    });
+  };
+
   return (
     <section id="planos" className="bg-background py-24">
       <div className="mx-auto max-w-7xl px-6">
-        
+
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
           <span className="text-sm font-semibold uppercase tracking-widest text-primary">
@@ -100,7 +107,11 @@ export function Plans() {
                 ))}
               </ul>
 
-              <button className="mt-8 w-full rounded-md bg-primary py-2 text-sm font-semibold text-white transition hover:opacity-90">
+              {/* BOTÃO FUNCIONANDO */}
+              <button
+                onClick={scrollToCadastro}
+                className="mt-8 w-full rounded-md bg-primary py-2 text-sm font-semibold text-white transition hover:opacity-90"
+              >
                 Escolher plano
               </button>
             </div>

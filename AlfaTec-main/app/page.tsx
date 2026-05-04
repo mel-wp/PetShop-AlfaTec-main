@@ -20,12 +20,6 @@ export default function Home() {
       <main>
         <Hero />
 
-        {/* BOTÃO */}
-        <div className="flex justify-center mt-6">
-          <Link href="/software">
-            <Button>Acessar software</Button>
-          </Link>
-        </div>
 
         <About />
         <Team />
