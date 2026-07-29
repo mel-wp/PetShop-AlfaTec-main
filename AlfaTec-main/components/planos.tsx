@@ -42,7 +42,8 @@ const plans = [
 
 export function Plans() {
 
-  const scrollToCadastro = () => {
+  const scrollToCadastro = (planName: string) => {
+    window.dispatchEvent(new CustomEvent("select-plan", { detail: planName }));
     document.getElementById("contato")?.scrollIntoView({
       behavior: "smooth",
     });
@@ -119,7 +120,7 @@ export function Plans() {
 
               {/* BOTÃO FUNCIONANDO */}
               <button
-                onClick={scrollToCadastro}
+                onClick={() => scrollToCadastro(plan.name)}
                 className="mt-8 w-full rounded-md bg-primary py-2 text-sm font-semibold text-white transition hover:opacity-90"
               >
                 Escolher plano

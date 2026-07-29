@@ -3,15 +3,12 @@ import { Hero } from "@/components/hero"
 import { About } from "@/components/about"
 import { Team } from "@/components/team"
 import { Services } from "@/components/services"
-import { Portfolio } from "@/components/portfolio"
-import { Brand } from "@/components/brand"
 import { Contact } from "@/components/contact"
 import { Footer } from "@/components/footer"
 import { Plans } from "@/components/planos"
 import { HowItWorks } from "@/components/how-it-works";
-
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { ProductDemo } from "@/components/product-demo"
+import { WhatsAppButton } from "@/components/whatsapp-button"
 
 export default function Home() {
   return (
@@ -26,15 +23,13 @@ export default function Home() {
         <Team />
         <Services />
         <Plans />
-        <Portfolio />
-        <Brand />
+        <ProductDemo />
         <Contact />
-        <Services />
-<HowItWorks />
-<Plans />
+        <HowItWorks />
       </main>
 
       <Footer />
+      <WhatsAppButton />
     </>
   )
 }

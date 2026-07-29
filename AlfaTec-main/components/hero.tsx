@@ -31,16 +31,16 @@ export function Hero() {
 
         <div className="flex flex-col items-center gap-4 sm:flex-row">
           <a
-            href="#servicos"
+            href="#demonstracao"
             className="rounded-md bg-background px-8 py-3 text-base font-semibold text-primary transition-colors hover:bg-background/90"
           >
-            Conheça Nossos Serviços
+            Agendar demonstração grátis
           </a>
           <a
             href="#contato"
             className="rounded-md border border-primary-foreground/30 px-8 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/10"
           >
-            Entre em Contato
+            Ver demonstração
           </a>
         </div>
 

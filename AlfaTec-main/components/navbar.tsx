@@ -51,7 +51,7 @@ export function Navbar() {
           href="#contato"
           className="hidden rounded-md bg-background px-5 py-2 text-sm font-semibold text-primary transition-colors hover:bg-background/90 lg:inline-flex"
         >
-          Fale Conosco
+          Agendar demonstração grátis
         </a>
 
         {/* Mobile toggle */}
@@ -83,7 +83,7 @@ export function Navbar() {
               onClick={() => setOpen(false)}
               className="mt-2 rounded-md bg-background px-5 py-2 text-center text-sm font-semibold text-primary transition-colors hover:bg-background/90"
             >
-              Fale Conosco
+              Agendar demonstração grátis
             </a>
           </div>
         </nav>
