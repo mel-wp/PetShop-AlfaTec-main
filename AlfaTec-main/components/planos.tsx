@@ -64,17 +64,27 @@ export function Plans() {
             Planos flexíveis que acompanham o crescimento do seu pet shop.
           </p>
         </div>
+        <div className="mb-14 text-center">
+
+          <h2 className="text-4xl font-bold">
+            Escolha o plano ideal
+          </h2>
+
+          <p className="mt-4 text-lg text-muted-foreground">
+            Mais organização para você, mais cuidado para os pets.
+          </p>
+
+        </div>
 
         {/* Cards */}
         <div className="mt-16 grid gap-8 md:grid-cols-3">
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-lg border bg-card p-8 transition-all hover:shadow-lg ${
-                plan.highlight
+              className={`relative rounded-lg border bg-card p-8 transition-all hover:shadow-lg ${plan.highlight
                   ? "border-primary shadow-md scale-[1.02]"
                   : "border-border hover:border-primary/30"
-              }`}
+                }`}
             >
               {/* Badge destaque */}
               {plan.highlight && (

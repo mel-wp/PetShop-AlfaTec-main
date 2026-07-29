@@ -8,6 +8,7 @@ import { Brand } from "@/components/brand"
 import { Contact } from "@/components/contact"
 import { Footer } from "@/components/footer"
 import { Plans } from "@/components/planos"
+import { HowItWorks } from "@/components/how-it-works";
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -28,6 +29,9 @@ export default function Home() {
         <Portfolio />
         <Brand />
         <Contact />
+        <Services />
+<HowItWorks />
+<Plans />
       </main>
 
       <Footer />
