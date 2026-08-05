@@ -121,7 +121,7 @@ export function Plans() {
               {/* BOTÃO FUNCIONANDO */}
               <button
                 onClick={() => scrollToCadastro(plan.name)}
-                className="mt-8 w-full rounded-md bg-primary py-2 text-sm font-semibold text-white transition hover:opacity-90"
+                className="mt-8 min-h-11 w-full rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
               >
                 Escolher plano
               </button>

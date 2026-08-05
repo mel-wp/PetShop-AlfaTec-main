@@ -64,7 +64,8 @@ export function Portfolio() {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+              aria-pressed={activeCategory === cat}
+              className={`min-h-11 rounded-full px-5 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary ${
                 activeCategory === cat
                   ? "bg-primary text-primary-foreground"
                   : "bg-card text-muted-foreground hover:bg-card hover:text-foreground"

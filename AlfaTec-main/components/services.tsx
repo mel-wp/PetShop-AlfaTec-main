@@ -68,10 +68,11 @@ export function Services() {
         {/* Service cards */}
         <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
-            <div
+            <a
               key={service.title}
-              onClick={() => window.location.href = "http://localhost:3001"}
-              className="group cursor-pointer rounded-lg border border-border bg-card p-8 transition-all hover:border-primary/30 hover:shadow-lg"
+              href="http://localhost:3001"
+              aria-label={`Abrir o sistema AlfaTec e conhecer ${service.title}`}
+              className="group block min-h-11 rounded-lg border border-border bg-card p-8 transition-all hover:border-primary/30 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
             >
               <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-primary/10">
                 <service.icon className="h-7 w-7 text-primary" />
@@ -82,7 +83,7 @@ export function Services() {
               <p className="mt-3 text-base leading-relaxed text-muted-foreground">
                 {service.description}
               </p>
-            </div>
+            </a>
           ))}
         </div>
       </div>

@@ -80,7 +80,7 @@ export function Contact() {
           </div>
 
           {/* Right column - Form */}
-          <div className="rounded-lg border border-border bg-card p-8">
+          <div className="rounded-lg border border-border bg-card p-5 sm:p-8">
             <h3 className="text-xl font-bold text-foreground font-mono">
               Agende sua demonstração grátis
             </h3>
@@ -96,14 +96,17 @@ export function Contact() {
                 <input
                   id="name"
                   type="text"
+                  name="name"
+                  autoComplete="name"
+                  required
                   placeholder="Seu nome"
-                  className="w-full rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+                  className="min-h-11 w-full rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none"
                 />
               </div>
 
               <div>
                 <label htmlFor="plan" className="mb-1.5 block text-sm font-medium text-foreground">Plano de interesse</label>
-                <select id="plan" value={selectedPlan} onChange={(event) => setSelectedPlan(event.target.value)} className="w-full rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
+                <select id="plan" name="plan" value={selectedPlan} onChange={(event) => setSelectedPlan(event.target.value)} className="min-h-11 w-full rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none">
                   <option value="">Quero conhecer as opções</option>
                   <option value="Básico">Básico</option>
                   <option value="Profissional">Profissional</option>
@@ -121,8 +124,11 @@ export function Contact() {
                 <input
                   id="email"
                   type="email"
+                  name="email"
+                  autoComplete="email"
+                  required
                   placeholder="seu@email.com"
-                  className="w-full rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+                  className="min-h-11 w-full rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none"
                 />
               </div>
 
@@ -136,8 +142,10 @@ export function Contact() {
                 <input
                   id="phone"
                   type="tel"
+                  name="phone"
+                  autoComplete="tel"
                   placeholder="(00) 00000-0000"
-                  className="w-full rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+                  className="min-h-11 w-full rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none"
                 />
               </div>
 
@@ -150,15 +158,16 @@ export function Contact() {
                 </label>
                 <textarea
                   id="message"
+                  name="message"
                   rows={4}
                   placeholder="Conte-nos sobre o seu pet shop..."
-                  className="w-full resize-none rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+                  className="w-full resize-none rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none"
                 />
               </div>
 
               <button
                 type="submit"
-                className="rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                className="min-h-11 rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
               >
                 Agendar demonstração grátis
               </button>

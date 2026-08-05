@@ -32,13 +32,13 @@ export function Hero() {
         <div className="flex flex-col items-center gap-4 sm:flex-row">
           <a
             href="#demonstracao"
-            className="rounded-md bg-background px-8 py-3 text-base font-semibold text-primary transition-colors hover:bg-background/90"
+            className="inline-flex min-h-11 items-center justify-center rounded-md bg-background px-8 py-3 text-base font-semibold text-primary transition-colors hover:bg-background/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-foreground"
           >
             Agendar demonstração grátis
           </a>
           <a
             href="#contato"
-            className="rounded-md border border-primary-foreground/30 px-8 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/10"
+            className="inline-flex min-h-11 items-center justify-center rounded-md border border-primary-foreground/30 px-8 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-foreground"
           >
             Ver demonstração
           </a>

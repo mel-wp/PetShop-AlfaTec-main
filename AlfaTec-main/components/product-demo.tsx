@@ -17,7 +17,7 @@ export function ProductDemo() {
           <p className="mt-4 text-lg leading-relaxed text-muted-foreground">Uma prévia do painel AlfaTec, com os recursos usados no dia a dia da operação.</p>
         </div>
         <div className="mt-10 flex justify-center gap-2" role="tablist" aria-label="Telas do sistema">
-          {screens.map((item) => <button key={item} type="button" role="tab" aria-selected={screen === item} onClick={() => setScreen(item)} className={`rounded-full px-5 py-2 text-sm font-semibold transition ${screen === item ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-primary"}`}>{item}</button>)}
+          {screens.map((item) => <button key={item} type="button" role="tab" aria-selected={screen === item} onClick={() => setScreen(item)} className={`min-h-11 rounded-full px-5 py-2 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary ${screen === item ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-primary"}`}>{item}</button>)}
         </div>
         <div className="mt-8 overflow-hidden rounded-xl border border-border bg-background shadow-xl">
           <div className="flex items-center gap-2 border-b border-border bg-slate-50 px-4 py-3"><i className="h-2.5 w-2.5 rounded-full bg-red-400" /><i className="h-2.5 w-2.5 rounded-full bg-yellow-400" /><i className="h-2.5 w-2.5 rounded-full bg-green-400" /><span className="ml-3 text-xs font-medium text-muted-foreground">app.alfatec.com.br/dashboard</span></div>
@@ -26,7 +26,7 @@ export function ProductDemo() {
             <div className="p-5 sm:p-8">{screen === "Dashboard" ? <Dashboard /> : screen === "Agenda" ? <Agenda /> : <Stock />}</div>
           </div>
         </div>
-        <div className="mt-8 flex flex-col items-center justify-between gap-4 rounded-lg border border-primary/15 bg-primary/5 p-5 sm:flex-row"><p className="text-center text-sm font-medium text-foreground sm:text-left">Quer ver esses recursos aplicados à rotina do seu negócio?</p><a href="#contato" className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90">Agendar demonstração grátis</a></div>
+        <div className="mt-8 flex flex-col items-center justify-between gap-4 rounded-lg border border-primary/15 bg-primary/5 p-5 sm:flex-row"><p className="text-center text-sm font-medium text-foreground sm:text-left">Quer ver esses recursos aplicados à rotina do seu negócio?</p><a href="#contato" className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary">Agendar demonstração grátis</a></div>
       </div>
     </section>
   )
