@@ -13,12 +13,9 @@ import { WhatsAppButton } from "@/components/whatsapp-button"
 export default function Home() {
   return (
     <>
-      <a href="#conteudo-principal" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-background focus:px-4 focus:py-3 focus:font-semibold focus:text-primary focus:shadow-lg">
-        Pular para o conteúdo principal
-      </a>
       <Navbar />
 
-      <main id="conteudo-principal">
+      <main>
         <Hero />
 
 

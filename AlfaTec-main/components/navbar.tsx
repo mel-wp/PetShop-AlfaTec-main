@@ -20,7 +20,7 @@ export function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-primary">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-        <a href="#inicio" className="flex min-h-11 items-center gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-foreground">
+        <a href="#inicio" className="flex items-center gap-3">
           <Image
             src="/images/logo.jpeg"
             alt="AlfaTech Logo"
@@ -49,7 +49,7 @@ export function Navbar() {
         {/* CTA */}
         <a
           href="#contato"
-          className="hidden min-h-11 items-center rounded-md bg-background px-5 py-2 text-sm font-semibold text-primary transition-colors hover:bg-background/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-foreground lg:inline-flex"
+          className="hidden rounded-md bg-background px-5 py-2 text-sm font-semibold text-primary transition-colors hover:bg-background/90 lg:inline-flex"
         >
           Agendar demonstração grátis
         </a>
@@ -83,7 +83,7 @@ export function Navbar() {
             <a
               href="#contato"
               onClick={() => setOpen(false)}
-              className="mt-2 flex min-h-11 items-center justify-center rounded-md bg-background px-5 py-2 text-center text-sm font-semibold text-primary transition-colors hover:bg-background/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-foreground"
+              className="mt-2 rounded-md bg-background px-5 py-2 text-center text-sm font-semibold text-primary transition-colors hover:bg-background/90"
             >
               Agendar demonstração grátis
             </a>

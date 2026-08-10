@@ -96,9 +96,6 @@ export function Contact() {
                 <input
                   id="name"
                   type="text"
-                  name="name"
-                  autoComplete="name"
-                  required
                   placeholder="Seu nome"
                   className="min-h-11 w-full rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none"
                 />
@@ -106,7 +103,7 @@ export function Contact() {
 
               <div>
                 <label htmlFor="plan" className="mb-1.5 block text-sm font-medium text-foreground">Plano de interesse</label>
-                <select id="plan" name="plan" value={selectedPlan} onChange={(event) => setSelectedPlan(event.target.value)} className="min-h-11 w-full rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none">
+                <select id="plan" value={selectedPlan} onChange={(event) => setSelectedPlan(event.target.value)} className="min-h-11 w-full rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none">
                   <option value="">Quero conhecer as opções</option>
                   <option value="Básico">Básico</option>
                   <option value="Profissional">Profissional</option>
@@ -124,9 +121,6 @@ export function Contact() {
                 <input
                   id="email"
                   type="email"
-                  name="email"
-                  autoComplete="email"
-                  required
                   placeholder="seu@email.com"
                   className="min-h-11 w-full rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none"
                 />
@@ -142,8 +136,6 @@ export function Contact() {
                 <input
                   id="phone"
                   type="tel"
-                  name="phone"
-                  autoComplete="tel"
                   placeholder="(00) 00000-0000"
                   className="min-h-11 w-full rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none"
                 />
@@ -158,10 +150,9 @@ export function Contact() {
                 </label>
                 <textarea
                   id="message"
-                  name="message"
                   rows={4}
                   placeholder="Conte-nos sobre o seu pet shop..."
-                  className="w-full resize-none rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none"
+                  className="w-full resize-none rounded-md border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                 />
               </div>
 
