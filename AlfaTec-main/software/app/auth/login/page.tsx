@@ -23,10 +23,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  // ✅ TESTE DO .ENV (DEIXA ISSO POR ENQUANTO)
-  console.log("URL:", process.env.NEXT_PUBLIC_SUPABASE_URL)
-  console.log("KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     const supabase = createClient()
@@ -34,13 +30,19 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('1. Iniciando login...')
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
+      console.log('2. Resposta recebida:', { data, error })
       if (error) throw error
+      console.log('3. Login OK, sessão:', data.session)
+      console.log('4. Chamando router.push...')
       router.push('/dashboard')
+      console.log('5. router.push chamado')
     } catch (error: unknown) {
+      console.log('ERRO no catch:', error)
       setError(error instanceof Error ? error.message : 'Ocorreu um erro')
     } finally {
       setIsLoading(false)
