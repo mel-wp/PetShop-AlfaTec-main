@@ -30,19 +30,13 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      console.log('1. Iniciando login...')
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
-      console.log('2. Resposta recebida:', { data, error })
       if (error) throw error
-      console.log('3. Login OK, sessão:', data.session)
-      console.log('4. Chamando router.push...')
       router.push('/dashboard')
-      console.log('5. router.push chamado')
     } catch (error: unknown) {
-      console.log('ERRO no catch:', error)
       setError(error instanceof Error ? error.message : 'Ocorreu um erro')
     } finally {
       setIsLoading(false)
