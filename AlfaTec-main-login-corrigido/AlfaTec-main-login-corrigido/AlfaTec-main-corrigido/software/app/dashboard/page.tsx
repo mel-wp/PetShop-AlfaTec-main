@@ -44,13 +44,12 @@ async function getDashboardData() {
     .from("products")
     .select(`*, category:product_categories(*)`, { count: "exact" })
     .eq("is_active", true)
-    .lt("stock_quantity", supabase.rpc ? 0 : 999999) // Will be filtered below
-    .limit(5)
+    .limit(100)
 
   // Filter products where stock is below minimum
   const filteredLowStock = lowStockProducts?.filter(
     (p) => p.stock_quantity <= p.min_stock
-  ) || []
+  ).slice(0, 5) || []
 
   // Get pending payables
   const { count: pendingPayables } = await supabase
