@@ -70,7 +70,9 @@ export function Services() {
           {services.map((service) => (
             <a
               key={service.title}
-              href="http://192.168.1.23:3001"
+              href="http://localhost:3001/"
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label={`Abrir o sistema AlfaTec e conhecer ${service.title}`}
               className="group block min-h-11 rounded-lg border border-border bg-card p-8 transition-all hover:border-primary/30 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
             >
