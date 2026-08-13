@@ -97,6 +97,9 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
         .select()
         .single()
 
+      console.log("DADOS ATUALIZADOS:", data)
+      console.log("ERRO AO ATUALIZAR:", error)
+
       if (!error && data) {
         setCustomers(customers.map(c => c.id === editingCustomer.id ? data as Customer : c))
       }
@@ -168,8 +171,8 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
                 {editingCustomer ? "Editar Cliente" : "Novo Cliente"}
               </DialogTitle>
               <DialogDescription>
-                {editingCustomer 
-                  ? "Atualize os dados do cliente" 
+                {editingCustomer
+                  ? "Atualize os dados do cliente"
                   : "Preencha os dados para cadastrar um novo cliente"}
               </DialogDescription>
             </DialogHeader>
