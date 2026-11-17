@@ -56,6 +56,7 @@ export function AppointmentsClient({ initialAppointments, pets, services }: Appo
   const [isLoading, setIsLoading] = useState(false)
   const [filterDate, setFilterDate] = useState("")
   const [filterStatus, setFilterStatus] = useState<string>("all")
+  const [formError, setFormError] = useState<string | null>(null)
   const router = useRouter()
 
   const [formData, setFormData] = useState({
@@ -72,13 +73,51 @@ export function AppointmentsClient({ initialAppointments, pets, services }: Appo
     return true
   })
 
+  const CONFLICT_MESSAGE =
+    "Já existe um atendimento agendado para esta data e horário. Escolha outro horário."
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setFormError(null)
+
+    // 1) Confere na lista que já está na tela
+    const localConflict = appointments.some(
+      (apt) =>
+        apt.scheduled_date === formData.scheduled_date &&
+        apt.scheduled_time.slice(0, 5) === formData.scheduled_time.slice(0, 5) &&
+        apt.status !== "cancelled"
+    )
+    if (localConflict) {
+      setFormError(CONFLICT_MESSAGE)
+      return
+    }
+
     setIsLoading(true)
 
     const supabase = createClient()
     const selectedService = services.find(s => s.id === formData.service_id)
 
+    // 2) Confere no banco (a lista da tela pode estar desatualizada)
+    const { data: existing, error: checkError } = await supabase
+      .from("appointments")
+      .select("id")
+      .eq("scheduled_date", formData.scheduled_date)
+      .eq("scheduled_time", formData.scheduled_time)
+      .neq("status", "cancelled")
+      .limit(1)
+
+    if (checkError) {
+      setFormError("Não foi possível verificar a disponibilidade. Tente novamente.")
+      setIsLoading(false)
+      return
+    }
+    if (existing && existing.length > 0) {
+      setFormError(CONFLICT_MESSAGE)
+      setIsLoading(false)
+      return
+    }
+
+    // 3) Salva (mesmo código de antes)
     const { data, error } = await supabase
       .from("appointments")
       .insert({
@@ -97,7 +136,14 @@ export function AppointmentsClient({ initialAppointments, pets, services }: Appo
       `)
       .single()
 
-    if (!error && data) {
+    if (error) {
+      console.error("Erro ao salvar agendamento:", error)
+      setFormError(`Erro ao salvar o agendamento: ${error.message}`)
+      setIsLoading(false)
+      return
+    }
+
+    if (data) {
       setAppointments([data as Appointment, ...appointments])
       setIsOpen(false)
       setFormData({
@@ -115,14 +161,14 @@ export function AppointmentsClient({ initialAppointments, pets, services }: Appo
 
   const updateStatus = async (id: string, newStatus: string) => {
     const supabase = createClient()
-    
+
     const { error } = await supabase
       .from("appointments")
       .update({ status: newStatus })
       .eq("id", id)
 
     if (!error) {
-      setAppointments(appointments.map(apt => 
+      setAppointments(appointments.map(apt =>
         apt.id === id ? { ...apt, status: newStatus as Appointment["status"] } : apt
       ))
     }
@@ -184,7 +230,7 @@ export function AppointmentsClient({ initialAppointments, pets, services }: Appo
           )}
         </div>
 
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) setFormError(null) }}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
@@ -277,6 +323,11 @@ export function AppointmentsClient({ initialAppointments, pets, services }: Appo
                     placeholder="Observações opcionais..."
                   />
                 </div>
+                {formError && (
+                  <p role="alert" className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+                    {formError}
+                  </p>
+                )}
               </div>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
