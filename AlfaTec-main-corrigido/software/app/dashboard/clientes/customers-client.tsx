@@ -37,6 +37,7 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
   const router = useRouter()
 
@@ -80,6 +81,7 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setErrorMessage("")
 
     const supabase = createClient()
 
@@ -97,11 +99,12 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
         .select()
         .single()
 
-      console.log("DADOS ATUALIZADOS:", data)
-      console.log("ERRO AO ATUALIZAR:", error)
-
       if (!error && data) {
-        setCustomers(customers.map(c => c.id === editingCustomer.id ? data as Customer : c))
+        setCustomers(customers.map(c => c.id === editingCustomer.id ? { ...c, ...data } as Customer : c))
+      } else {
+        setErrorMessage(error?.message || "Não foi possível atualizar o cliente.")
+        setIsLoading(false)
+        return
       }
     } else {
       const { data, error } = await supabase
@@ -118,6 +121,10 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
 
       if (!error && data) {
         setCustomers([data as Customer, ...customers])
+      } else {
+        setErrorMessage(error?.message || "Não foi possível cadastrar o cliente.")
+        setIsLoading(false)
+        return
       }
     }
 
@@ -130,6 +137,7 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
   const handleDelete = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir este cliente?")) return
 
+    setErrorMessage("")
     const supabase = createClient()
     const { error } = await supabase
       .from("customers")
@@ -138,12 +146,19 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
 
     if (!error) {
       setCustomers(customers.filter(c => c.id !== id))
+    } else {
+      setErrorMessage(error.message || "Não foi possível excluir o cliente.")
     }
     router.refresh()
   }
 
   return (
     <div className="space-y-4">
+      {errorMessage && (
+        <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+          {errorMessage}
+        </p>
+      )}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -178,6 +193,16 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
             </DialogHeader>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-4 py-4">
+                {editingCustomer && (
+                  <div className="grid gap-2">
+                    <Label>Animais vinculados</Label>
+                    <p className="text-sm text-muted-foreground">
+                      {editingCustomer.pets?.length
+                        ? editingCustomer.pets.map((pet) => pet.name).join(", ")
+                        : "Nenhum animal cadastrado para este cliente."}
+                    </p>
+                  </div>
+                )}
                 <div className="grid gap-2">
                   <Label htmlFor="name">Nome Completo *</Label>
                   <Input
@@ -273,6 +298,7 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
                   <TableHead>Nome</TableHead>
                   <TableHead>Telefone</TableHead>
                   <TableHead>Email</TableHead>
+                  <TableHead>Animais</TableHead>
                   <TableHead>Endereço</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
@@ -294,6 +320,11 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
                           {customer.email}
                         </div>
                       )}
+                    </TableCell>
+                    <TableCell>
+                      {customer.pets?.length
+                        ? customer.pets.map((pet) => pet.name).join(", ")
+                        : <span className="text-muted-foreground">Nenhum animal</span>}
                     </TableCell>
                     <TableCell>
                       {customer.address && (

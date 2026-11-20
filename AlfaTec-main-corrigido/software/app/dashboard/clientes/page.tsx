@@ -7,7 +7,7 @@ async function getCustomersData() {
 
   const { data: customers } = await supabase
     .from("customers")
-    .select("*")
+    .select("*, pets(*)")
     .order("name", { ascending: true })
 
   return {

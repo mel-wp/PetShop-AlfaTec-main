@@ -9,6 +9,7 @@ export interface Customer {
   cpf: string | null
   created_at: string
   updated_at: string
+  pets?: Pet[]
 }
 
 export interface Pet {
@@ -59,15 +60,15 @@ export interface ProductCategory {
 
 export interface Product {
   id: string
-  category_id: string | null
+  category_id: string
   name: string
   description: string | null
   sku: string | null
-  barcode: string | null
   cost_price: number
   sale_price: number
   stock_quantity: number
   min_stock: number
+  unit: string
   is_active: boolean
   created_at: string
   updated_at: string
@@ -77,75 +78,31 @@ export interface Product {
 export interface Sale {
   id: string
   customer_id: string | null
+  user_id: string
   total_amount: number
-  discount_amount: number
-  payment_method: 'cash' | 'credit_card' | 'debit_card' | 'pix' | 'other'
-  status: 'pending' | 'completed' | 'cancelled'
+  payment_method: string
+  status: 'completed' | 'pending' | 'cancelled'
   notes: string | null
   created_at: string
   customer?: Customer
+  items?: SaleItem[]
 }
 
 export interface SaleItem {
   id: string
   sale_id: string
-  product_id: string | null
-  service_id: string | null
+  product_id: string
   quantity: number
   unit_price: number
-  total_price: number
+  subtotal: number
   product?: Product
-  service?: Service
 }
 
-export interface AccountPayable {
-  id: string
-  description: string
-  supplier: string | null
-  amount: number
-  due_date: string
-  paid_date: string | null
-  status: 'pending' | 'paid' | 'overdue' | 'cancelled'
-  category: string | null
-  notes: string | null
-  created_at: string
-  updated_at: string
-}
-
-export interface AccountReceivable {
-  id: string
-  customer_id: string | null
-  description: string
-  amount: number
-  due_date: string
-  received_date: string | null
-  status: 'pending' | 'received' | 'overdue' | 'cancelled'
-  notes: string | null
-  created_at: string
-  updated_at: string
-  customer?: Customer
-}
-
-export interface CashFlow {
-  id: string
-  type: 'income' | 'expense'
-  category: string
-  description: string
-  amount: number
-  date: string
-  reference_type: 'sale' | 'account_payable' | 'account_receivable' | 'manual' | null
-  reference_id: string | null
-  created_at: string
-}
-
-// Dashboard Stats
 export interface DashboardStats {
-  todayAppointments: number
-  todayRevenue: number
-  lowStockProducts: number
-  pendingPayables: number
-  monthlyRevenue: number
-  monthlyExpenses: number
   totalCustomers: number
   totalPets: number
+  totalProducts: number
+  lowStockProducts: number
+  todayAppointments: number
+  todayRevenue: number
 }
