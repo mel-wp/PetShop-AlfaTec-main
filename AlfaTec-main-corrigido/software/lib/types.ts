@@ -64,6 +64,7 @@ export interface Product {
   name: string
   description: string | null
   sku: string | null
+  barcode: string | null
   cost_price: number
   sale_price: number
   stock_quantity: number
@@ -79,8 +80,9 @@ export interface Sale {
   id: string
   customer_id: string | null
   user_id: string
-  total_amount: number
-  payment_method: string
+  total_amount?: number
+  total?: number
+  payment_method: 'cash' | 'credit_card' | 'debit_card' | 'pix' | 'other'
   status: 'completed' | 'pending' | 'cancelled'
   notes: string | null
   created_at: string
