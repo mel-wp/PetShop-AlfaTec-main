@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
@@ -78,9 +78,10 @@ const paymentMethodLabels = {
 }
 
 export function SalesClient({ initialSales, products, services, customers }: SalesClientProps) {
-  const [sales, setSales] = useState(initialSales)
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [saleError, setSaleError] = useState("")
+  const saleAttempt = useRef<{ id: string; request: string } | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [cart, setCart] = useState<CartItem[]>([])
   const [selectedCustomer, setSelectedCustomer] = useState<string>("")
@@ -89,8 +90,8 @@ export function SalesClient({ initialSales, products, services, customers }: Sal
   const [productSearch, setProductSearch] = useState("")
   const router = useRouter()
 
-  const filteredSales = sales.filter((sale) =>
-    sale.customer?.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredSales = initialSales.filter((sale) =>
+    (sale.customer?.name ?? "").toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const filteredProducts = products.filter((product) =>
@@ -101,8 +102,19 @@ export function SalesClient({ initialSales, products, services, customers }: Sal
   const discountAmount = parseFloat(discount) || 0
   const finalTotal = Math.max(0, cartTotal - discountAmount)
 
+  const unavailableItem = cart.find((item) =>
+    item.product_id && item.quantity > (products.find(product => product.id === item.product_id)?.stock_quantity ?? 0)
+  )
+  const stockError = unavailableItem ? `Estoque insuficiente para ${unavailableItem.name}.` : ""
+
   const addToCart = (product: Product) => {
+    if (isLoading) return
     const existing = cart.find(item => item.product_id === product.id)
+    if ((existing?.quantity ?? 0) >= product.stock_quantity) {
+      setSaleError(`Estoque insuficiente para ${product.name}. Disponível: ${product.stock_quantity}.`)
+      return
+    }
+    setSaleError("")
     if (existing) {
       setCart(cart.map(item => 
         item.product_id === product.id 
@@ -122,6 +134,8 @@ export function SalesClient({ initialSales, products, services, customers }: Sal
   }
 
   const addServiceToCart = (service: Service) => {
+    if (isLoading) return
+    setSaleError("")
     const existing = cart.find(item => item.service_id === service.id)
     if (existing) {
       setCart(cart.map(item => 
@@ -142,87 +156,66 @@ export function SalesClient({ initialSales, products, services, customers }: Sal
   }
 
   const updateQuantity = (id: string, quantity: number) => {
-    if (quantity <= 0) {
-      setCart(cart.filter(item => item.id !== id))
-    } else {
-      setCart(cart.map(item => 
-        item.id === id ? { ...item, quantity } : item
-      ))
+    if (!Number.isInteger(quantity) || quantity < 1) {
+      setSaleError("Informe uma quantidade inteira maior que zero.")
+      return
     }
+    setSaleError("")
+    setCart(cart.map(item => item.id === id ? { ...item, quantity } : item))
   }
 
   const removeFromCart = (id: string) => {
+    setSaleError("")
     setCart(cart.filter(item => item.id !== id))
   }
 
   const handleSubmit = async () => {
-    if (cart.length === 0) return
+    if (isLoading || cart.length === 0 || stockError) return
+    setSaleError("")
     setIsLoading(true)
 
-    const supabase = createClient()
-
-    // Create sale
-    const { data: sale, error: saleError } = await supabase
-      .from("sales")
-      .insert({
-        customer_id: selectedCustomer || null,
-        total_amount: finalTotal,
-        discount_amount: discountAmount,
-        payment_method: paymentMethod,
-        status: "completed",
-      })
-      .select(`*, customer:customers(*)`)
-      .single()
-
-    if (saleError || !sale) {
-      setIsLoading(false)
-      return
-    }
-
-    // Create sale items
-    const saleItems = cart.map(item => ({
-      sale_id: sale.id,
-      product_id: item.product_id || null,
-      service_id: item.service_id || null,
-      quantity: item.quantity,
-      unit_price: item.unit_price,
-      total_price: item.quantity * item.unit_price,
-    }))
-
-    await supabase.from("sale_items").insert(saleItems)
-
-    // Update stock for products
-    for (const item of cart) {
-      if (item.product_id) {
-        const product = products.find(p => p.id === item.product_id)
-        if (product) {
-          await supabase
-            .from("products")
-            .update({ stock_quantity: product.stock_quantity - item.quantity })
-            .eq("id", item.product_id)
-        }
+    try {
+      const sale = {
+        p_customer_id: selectedCustomer || null,
+        p_payment_method: paymentMethod,
+        p_discount: discountAmount,
+        p_items: cart.map(item => ({
+          product_id: item.product_id ?? null,
+          service_id: item.service_id ?? null,
+          quantity: item.quantity,
+        })),
       }
+      const request = JSON.stringify(sale)
+      if (saleAttempt.current?.request !== request) {
+        saleAttempt.current = { id: crypto.randomUUID(), request }
+      }
+
+      const supabase = createClient()
+      const { error } = await supabase.rpc("register_sale", {
+        ...sale,
+        p_sale_id: saleAttempt.current.id,
+      })
+
+      if (error) {
+        setSaleError(error.code === "P0001" || error.code === "22023"
+          ? error.message
+          : "Não foi possível confirmar a venda. Tente novamente.")
+        if (error.code === "P0001") router.refresh()
+        return
+      }
+
+      saleAttempt.current = null
+      setIsOpen(false)
+      setCart([])
+      setSelectedCustomer("")
+      setPaymentMethod("cash")
+      setDiscount("0")
+      router.refresh()
+    } catch {
+      setSaleError("Não foi possível confirmar a venda. Tente novamente.")
+    } finally {
+      setIsLoading(false)
     }
-
-    // Add to cash flow
-    await supabase.from("cash_flow").insert({
-      type: "income",
-      category: "Venda",
-      description: `Venda #${sale.id.slice(0, 8)}`,
-      amount: finalTotal,
-      date: new Date().toISOString().split("T")[0],
-      reference_type: "sale",
-      reference_id: sale.id,
-    })
-
-    setSales([sale as Sale, ...sales])
-    setIsOpen(false)
-    setCart([])
-    setSelectedCustomer("")
-    setPaymentMethod("cash")
-    setDiscount("0")
-    setIsLoading(false)
-    router.refresh()
   }
 
   const formatCurrency = (value: number) => {
@@ -255,7 +248,9 @@ export function SalesClient({ initialSales, products, services, customers }: Sal
           />
         </div>
 
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={isOpen} onOpenChange={(open) => {
+          if (!isLoading) setIsOpen(open)
+        }}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
@@ -369,15 +364,18 @@ export function SalesClient({ initialSales, products, services, customers }: Sal
                           <div className="flex items-center gap-2">
                             <Input
                               type="number"
+                              aria-label={`Quantidade de ${item.name}`}
                               value={item.quantity}
-                              onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 0)}
+                              onChange={(e) => updateQuantity(item.id, e.target.valueAsNumber)}
                               className="w-16 text-center"
                               min={1}
+                              disabled={isLoading}
                             />
                             <Button
                               size="icon"
                               variant="ghost"
                               onClick={() => removeFromCart(item.id)}
+                              disabled={isLoading}
                             >
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
@@ -477,13 +475,16 @@ export function SalesClient({ initialSales, products, services, customers }: Sal
               </Card>
             </div>
 
+            {(stockError || saleError) && (
+              <p role="alert" className="text-sm text-destructive">{stockError || saleError}</p>
+            )}
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={isLoading}>
                 Cancelar
               </Button>
               <Button 
                 onClick={handleSubmit} 
-                disabled={isLoading || cart.length === 0}
+                disabled={isLoading || cart.length === 0 || Boolean(stockError)}
               >
                 {isLoading ? "Finalizando..." : "Finalizar Venda"}
               </Button>
@@ -525,7 +526,7 @@ export function SalesClient({ initialSales, products, services, customers }: Sal
                       <TableCell>{sale.customer?.name || "Cliente não identificado"}</TableCell>
                       <TableCell>{paymentMethodLabels[sale.payment_method]}</TableCell>
                       <TableCell className="font-medium">
-                        {formatCurrency(sale.total_amount)}
+                        {formatCurrency(sale.total_amount ?? sale.total ?? 0)}
                       </TableCell>
                       <TableCell>
                         <Badge variant={status.variant}>{status.label}</Badge>

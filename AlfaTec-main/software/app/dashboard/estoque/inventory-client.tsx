@@ -41,10 +41,11 @@ interface InventoryClientProps {
   categories: ProductCategory[]
 }
 
-export function InventoryClient({ initialProducts, categories }: InventoryClientProps) {
-  const [products, setProducts] = useState(initialProducts)
+export function InventoryClient({ initialProducts: products, categories }: InventoryClientProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [stockError, setStockError] = useState("")
+  const [formError, setFormError] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
   const [filterCategory, setFilterCategory] = useState<string>("all")
   const [filterStock, setFilterStock] = useState<string>("all")
@@ -80,6 +81,7 @@ export function InventoryClient({ initialProducts, categories }: InventoryClient
   const lowStockCount = products.filter(p => p.stock_quantity <= p.min_stock).length
 
   const resetForm = () => {
+    setFormError("")
     setFormData({
       category_id: "",
       name: "",
@@ -95,6 +97,7 @@ export function InventoryClient({ initialProducts, categories }: InventoryClient
   }
 
   const openEditDialog = (product: Product) => {
+    setFormError("")
     setEditingProduct(product)
     setFormData({
       category_id: product.category_id || "",
@@ -112,6 +115,12 @@ export function InventoryClient({ initialProducts, categories }: InventoryClient
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const quantity = Number(formData.stock_quantity)
+    if (formData.stock_quantity === "" || !Number.isInteger(quantity) || quantity < 0) {
+      setFormError("Informe uma quantidade inteira maior ou igual a zero.")
+      return
+    }
+    setFormError("")
     setIsLoading(true)
 
     const supabase = createClient()
@@ -123,36 +132,29 @@ export function InventoryClient({ initialProducts, categories }: InventoryClient
       barcode: formData.barcode || null,
       cost_price: parseFloat(formData.cost_price),
       sale_price: parseFloat(formData.sale_price),
-      stock_quantity: parseInt(formData.stock_quantity),
+      stock_quantity: quantity,
       min_stock: parseInt(formData.min_stock),
     }
 
-    if (editingProduct) {
-      const { data, error } = await supabase
-        .from("products")
-        .update(productData)
+    const query = editingProduct
+      ? supabase.from("products").update(productData)
         .eq("id", editingProduct.id)
-        .select(`*, category:product_categories(*)`)
-        .single()
+        .eq("stock_quantity", editingProduct.stock_quantity)
+      : supabase.from("products").insert(productData)
 
-      if (!error && data) {
-        setProducts(products.map(p => p.id === editingProduct.id ? data as Product : p))
-      }
-    } else {
-      const { data, error } = await supabase
-        .from("products")
-        .insert(productData)
-        .select(`*, category:product_categories(*)`)
-        .single()
+    const { data, error } = await query.select("id").maybeSingle()
+    setIsLoading(false)
 
-      if (!error && data) {
-        setProducts([data as Product, ...products])
-      }
+    if (error || !data) {
+      setFormError(error
+        ? "Não foi possível salvar o produto. Confira os dados e tente novamente."
+        : "O estoque mudou. Feche e reabra a edição para conferir o saldo atual.")
+      router.refresh()
+      return
     }
 
     setIsOpen(false)
     resetForm()
-    setIsLoading(false)
     router.refresh()
   }
 
@@ -165,21 +167,34 @@ export function InventoryClient({ initialProducts, categories }: InventoryClient
       .delete()
       .eq("id", id)
 
-    if (!error) {
-      setProducts(products.filter(p => p.id !== id))
-    }
+    if (error) return
     router.refresh()
   }
 
-  const updateStock = async (id: string, newQuantity: number) => {
-    const supabase = createClient()
-    const { error } = await supabase
-      .from("products")
-      .update({ stock_quantity: newQuantity })
-      .eq("id", id)
+  const updateStock = async (product: Product, input: HTMLInputElement) => {
+    const quantity = input.valueAsNumber
+    input.value = String(product.stock_quantity)
+    setStockError("")
 
-    if (!error) {
-      setProducts(products.map(p => p.id === id ? { ...p, stock_quantity: newQuantity } : p))
+    if (!Number.isInteger(quantity) || quantity < 0) {
+      setStockError("Informe uma quantidade inteira maior ou igual a zero.")
+      return
+    }
+    if (quantity === product.stock_quantity) return
+
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from("products")
+      .update({ stock_quantity: quantity })
+      .eq("id", product.id)
+      .eq("stock_quantity", product.stock_quantity)
+      .select("id")
+      .maybeSingle()
+
+    if (error || !data) {
+      setStockError(error
+        ? "Não foi possível salvar o estoque. Tente novamente."
+        : "O estoque mudou. Confira o saldo atualizado antes de editar novamente.")
     }
     router.refresh()
   }
@@ -193,6 +208,7 @@ export function InventoryClient({ initialProducts, categories }: InventoryClient
 
   return (
     <div className="space-y-4">
+      {stockError && <p role="alert" className="text-sm text-destructive">{stockError}</p>}
       {lowStockCount > 0 && (
         <Card className="border-warning bg-warning/5">
           <CardContent className="flex items-center gap-4 p-4">
@@ -363,6 +379,7 @@ export function InventoryClient({ initialProducts, categories }: InventoryClient
                     <Input
                       id="stock_quantity"
                       type="number"
+                      min={0}
                       value={formData.stock_quantity}
                       onChange={(e) =>
                         setFormData({ ...formData, stock_quantity: e.target.value })
@@ -394,6 +411,7 @@ export function InventoryClient({ initialProducts, categories }: InventoryClient
                   />
                 </div>
               </div>
+              {formError && <p role="alert" className="text-sm text-destructive">{formError}</p>}
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => {
                   setIsOpen(false)
@@ -463,9 +481,15 @@ export function InventoryClient({ initialProducts, categories }: InventoryClient
                             <TrendingDown className="h-4 w-4 text-warning" />
                           )}
                           <Input
+                            key={product.stock_quantity}
                             type="number"
-                            value={product.stock_quantity}
-                            onChange={(e) => updateStock(product.id, parseInt(e.target.value) || 0)}
+                            aria-label={`Estoque de ${product.name}`}
+                            min={0}
+                            defaultValue={product.stock_quantity}
+                            onBlur={(e) => updateStock(product, e.currentTarget)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") e.currentTarget.blur()
+                            }}
                             className={`w-20 ${isLowStock ? 'border-warning' : ''}`}
                           />
                           <span className="text-xs text-muted-foreground">

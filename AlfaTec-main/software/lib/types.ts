@@ -77,7 +77,8 @@ export interface Product {
 export interface Sale {
   id: string
   customer_id: string | null
-  total_amount: number
+  total_amount?: number
+  total?: number
   discount_amount: number
   payment_method: 'cash' | 'credit_card' | 'debit_card' | 'pix' | 'other'
   status: 'pending' | 'completed' | 'cancelled'
